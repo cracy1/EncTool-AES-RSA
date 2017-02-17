@@ -1,27 +1,18 @@
-
-// An encryption tool
-// Apart of Ex1 for Intro. to Comp. Sec.
-
 import java.io.Console;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
 import java.security.Key;
-import java.security.KeyPair;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.Certificate;
-import java.security.spec.RSAPrivateKeySpec;
 import java.util.Arrays;
-import java.util.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -121,7 +112,7 @@ public class EncTool {
 			// Encrypt the plaintext with the AES key
 			byte[] cipherText = aesCipher.doFinal(plainText);
 
-			// Write the encrypted AES key and Ciphertext to the
+			// Write the encrypted AES key and cipher text to the
 			// file.
 			System.out.println("Writting to file: " + outFile);
 			FileOutputStream outToFile = new FileOutputStream(outFile);
@@ -138,11 +129,14 @@ public class EncTool {
 
 	/**
 	 * Method to get the private key from the key store
-	 * @param keyStoreFile key store file
-	 * @param keyName key name
+	 * 
+	 * @param keyStoreFile
+	 *                key store file
+	 * @param keyName
+	 *                key name
 	 * @return private key
 	 */
-	
+
 	private static PrivateKey getPrivKey(String keyStoreFile, String keyName) {
 		PrivateKey key = null;
 		try {
@@ -202,23 +196,19 @@ public class EncTool {
 			rawDataFromFile.read(inBytes);
 			rawDataFromFile.close();
 
-			
 			byte[] keyBytes = new byte[256];
-			for(int i = 0; i < 256; i++){
+			for (int i = 0; i < 256; i++) {
 				keyBytes[i] = inBytes[i];
-//				System.out.println(keyBytes[i]); just for debugging purposes
 			}
-			
+
 			byte[] decryptedKey = rsaCipher.doFinal(keyBytes);
 
-		
 			SecretKeySpec key = new SecretKeySpec(decryptedKey, "AES");
 
 			Cipher aesCipher = Cipher.getInstance("AES");
 			aesCipher.init(Cipher.DECRYPT_MODE, key);
 
-			 byte[] cipherText = Arrays.copyOfRange(inBytes, 256,
-			 inBytes.length);
+			byte[] cipherText = Arrays.copyOfRange(inBytes, 256, inBytes.length);
 
 			byte[] original = aesCipher.doFinal(cipherText);
 
@@ -272,12 +262,6 @@ public class EncTool {
 			rawDataFromFile.read(inBytes);
 			rawDataFromFile.close();
 
-//			 System.out.println("file bytes");
-//			 for (int i=0; i<inBytes.length; i++) {
-//			 System.out.print(inBytes[i] + ", ");  just for debugging purposes
-//			 }
-//			 System.out.println();
-
 			byte[] ivBytes = Arrays.copyOfRange(inBytes, 0, 10);
 			System.out.println("Iv bytes");
 			for (int i = 0; i < ivBytes.length; i++) {
@@ -291,12 +275,6 @@ public class EncTool {
 			Cipher cipher = Cipher.getInstance("AES/CCM/NoPadding", new BouncyCastleProvider());
 
 			byte[] cipherText = Arrays.copyOfRange(inBytes, 10, inBytes.length);
-
-//			 System.out.println("cipher bytes");
-//			 for (int i=0; i<cipherText.length; i++) {
-//			 System.out.print(cipherText[i] + ", ");  just for debugging purposes
-//			 }
-//			 System.out.println();
 
 			cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
 
